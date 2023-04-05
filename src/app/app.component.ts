@@ -1,9 +1,17 @@
 import { Component } from '@angular/core';
 
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { Breakpoints } from '@angular/cdk/layout';
 
 import { CounterService } from './services/counter.service';
 import { FetchService } from 'src/app/services/fetch.service';
+
+// interface IPicturesList {
+//   largeImageURL: string;
+//   previewURL: string;
+//   previewHeight: number;
+//   previewWidth: number;
+//   tags: string;
+// }
 
 @Component({
   selector: 'app-root',
@@ -25,19 +33,13 @@ export class AppComponent {
   pictures: any = [];
   total: number = 0;
 
-  largeImageURL =
-    'https://pixabay.com/get/g86be8dece46644988c2f1041a68e228086d61dec360b0218858f021908b4d8b31274fd5530ebb4051421e0bc2b0e005f3819dacfcabd52780ebf62f348e3a71f_1280.jpg';
+  largeImageURL: string;
 
-  error: any = null;
+  error: Error | null = null;
 
-  constructor(
-    srv: CounterService,
-    private fetch: FetchService,
-    breakpointObserver: BreakpointObserver
-  ) {}
+  constructor(srv: CounterService, private fetch: FetchService) {}
 
   btnSearch(e: any) {
-    // this.appCounter++;
     this.fetch.QUERY_STRING = this.query;
     this.fetch.page = 1;
     this.getPictures();
@@ -60,43 +62,45 @@ export class AppComponent {
   getPictures() {
     console.log(Breakpoints.Web);
 
-    this.fetch.search().subscribe(
-      (response: any) => {
-        this.pictures = response.hits.map(
-          ({
-            largeImageURL,
-            previewURL,
-            previewHeight,
-            previewWidth,
-            tags,
-          }: any) => ({
-            largeImageURL,
-            previewURL,
-            previewHeight,
-            previewWidth,
-            tags,
-          })
-        );
+    this.pictures = this.fetch.search();
 
-        this.total = response.totalHits;
+    // this.fetch.search().subscribe(
+    //   (response: any) => {
+    //     this.pictures = response.hits.map(
+    //       ({
+    //         largeImageURL,
+    //         previewURL,
+    //         previewHeight,
+    //         previewWidth,
+    //         tags,
+    //       }: any) => ({
+    //         largeImageURL,
+    //         previewURL,
+    //         previewHeight,
+    //         previewWidth,
+    //         tags,
+    //       })
+    //     );
 
-        if (this.total === 0) {
-          this.page = 0;
-          this.perPage = 0;
-        } else {
-          this.page = this.fetch.page;
-          this.perPage = this.fetch.perPage;
-        }
+    //     this.total = response.totalHits;
 
-        const current = this.page * this.perPage;
+    //     if (this.total === 0) {
+    //       this.page = 0;
+    //       this.perPage = 0;
+    //     } else {
+    //       this.page = this.fetch.page;
+    //       this.perPage = this.fetch.perPage;
+    //     }
 
-        this.isNext = !(current > this.total || this.total === 0);
-        this.isBack = current > this.perPage;
-      },
-      (error) => {
-        this.error = error.message;
-        console.log(error);
-      }
-    );
+    //     const current = this.page * this.perPage;
+
+    //     this.isNext = !(current > this.total || this.total === 0);
+    //     this.isBack = current > this.perPage;
+    //   },
+    //   (error) => {
+    //     this.error = error.message;
+    //     console.log(error);
+    //   }
+    // );
   }
 }

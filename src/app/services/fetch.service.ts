@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, subscribeOn, throwError } from 'rxjs';
+import { catchError, retry } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +19,46 @@ export class FetchService {
   search() {
     const HTTP_REQUEST = `${this.BASE_URL}?key=${this.API_KEY}&q=${this.QUERY_STRING}&image_type=${this.IMAGE_TYPE}&page=${this.PAGE_NUMBER}&per_page=${this.PER_PAGE}`;
 
-    return this.http.get(HTTP_REQUEST);
+    type picturesList = {
+      largeImageURL: string;
+      previewURL: string;
+      previewHeight: number;
+      previewWidth: number;
+      tags: string;
+    };
+
+    let pictures: picturesList;
+
+    const response = this.http.get(HTTP_REQUEST);
+    response.subscribe((response: any) => {
+      pictures = response.hits.map(<T extends picturesList>(hit: T) => ({
+        largeImageURL: hit.largeImageURL,
+        previewURL: hit.previewURL,
+        previewHeight: hit.previewHeight,
+        previewWidth: hit.previewWidth,
+        tags: hit.tags,
+      }));
+      console.log(pictures);
+      return pictures;
+    });
+
+    // response.hits.map(
+    //   ({
+    //     largeImageURL,
+    //     previewURL,
+    //     previewHeight,
+    //     previewWidth,
+    //     tags,
+    //   }: any) => ({
+    //     largeImageURL,
+    //     previewURL,
+    //     previewHeight,
+    //     previewWidth,
+    //     tags,
+    //   })
+    // );
+
+    // return pictures;
   }
 
   get query(): string {
