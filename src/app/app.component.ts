@@ -62,8 +62,9 @@ export class AppComponent {
   getPictures() {
     console.log(Breakpoints.Web);
 
-    this.pictures = this.fetch.search();
-
+    // this.pictures = this.fetch.search();
+    // console.log('          ----------        ', this.fetch.search());
+    this.fetch.search().subscribe((res: []) => (this.pictures = res));
     // this.fetch.search().subscribe(
     //   (response: any) => {
     //     this.pictures = response.hits.map(
